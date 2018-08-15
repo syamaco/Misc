@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8" />
+        <title>play-seekbar example</title>
+        
+        <meta name="Description" content="" />
+        <meta name="Keywords"  content="" />
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+        <style type="text/css">
+         * {
+             margin: 0;
+             padding: 0;
+             border: 0;
+         }
+
+         body {
+             background: white;
+             font: 30px sans-serif;
+             text-align: center;
+             padding-top: 30vh;
+         }
+
+         div {
+             position: relative;
+         }
+
+         #progress {
+             -webkit-appearance: none;
+             background: #f82020;
+             border: 0;
+             height: 5px;
+             max-width: 100%;
+             width: 0px;
+             display: block;
+             position: absolute;
+             top: 0px;
+             left: 0px;
+         }
+
+         input[type="range"].seekbar {
+             -webkit-appearance: none;
+             appearance: none;
+             background: rgba(0, 0, 0, 0.2);
+             height: 5px;
+             position: absolute;
+             width: 100%;
+             left: 0px;
+             z-index: 1;
+         }
+         input[type="range"].seekbar:focus {
+             outline: none;
+         }
+         input[type="range"].seekbar::-webkit-slider-thumb {
+             -webkit-appearance: none;
+             appearance: none;
+             background: #f82020;
+             width: 30px;
+             height: 30px;
+             border-radius: 20px;
+             cursor: pointer;
+             -webkit-box-sizing: border-box;
+             box-sizing: border-box;
+             margin-bottom: 2px;
+         }
+        </style>
+    </head>
+    <body>
+        <div style="width: 50%; margin: auto;">
+            <input type="range" name="player" id="player" class="seekbar" step="1" min="0" max="100" value="0"/>
+            <span id="progress"></span>
+        </div>
+        
+        <script type="text/javascript">
+         // Progress redraw
+         function syncProgress(e) {
+             $('#progress').css('width', (e.innerWidth() / e.attr('max')) * e.val() + 'px');
+         }
+         function _syncProgress() {
+             var player = document.getElementById('player');
+             var b_v = player.value,
+                 max = player.max,
+                 range_x = player.clientWidth;
+
+             console.log('b_v : ' + b_v);
+
+             var b_r = (range_x / max) * b_v;
+             
+             $('#progress').css('width', b_r + 'px');
+         }
+         
+         // Dragging
+         $('#player').on('input', function() {
+             var player = $(this);
+             console.log('Dragging : ' + player.val() + ' [ ' + player.attr('max') + ' / ' + player.innerWidth() + ' ]');
+             syncProgress(player);
+         });
+         // Released
+         $('#player').on('change', function() {
+             var player = $(this);
+             console.log('Released : ' + player.val() + ' [ ' + player.attr('max') + ' / ' + player.innerWidth() + ' ]');
+         });
+         // Hooks val()
+         (function ($) {
+             var fnVal = $.fn.val;
+             $.fn.val = function(value) {
+                 if (typeof value === 'undefined') {
+                     return fnVal.call(this);
+                 } else {
+                     var result = fnVal.call(this, value);
+
+                     if ($(this).attr('id') == 'player') {
+                         //$.fn.change.call(this);
+                         syncProgress($(this));
+                     }
+
+                     return result;
+                 }
+             };
+         })(jQuery);
+        </script>
+    </body>
+</html>
